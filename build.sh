@@ -9,6 +9,7 @@ sudo apt install -y libsdl2-image-dev
 sudo apt install -y libsdl2-ttf-dev
 sudo apt-get install -y libglew-dev
 sudo apt-get install libbullet-dev -y
+sudo apt install git
 
 # RakNet installation:
 git clone https://github.com/facebookarchive/RakNet.git /home/pi/RakNet
