@@ -18,5 +18,9 @@ sudo apt install git --yes
 
 # RakNet installation:
 git clone https://github.com/clauridsen/RakNet.git /home/pi/RakNet
-cd /home/pi/RakNet
+
+
+git clone https://github.com/johndcollins/RTTClient.git /home/pi/RTTClient
+
+
 sudo reboot
