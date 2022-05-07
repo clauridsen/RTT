@@ -5,9 +5,13 @@ Run this Script first
 wget -O - https://raw.githubusercontent.com/clauridsen/RTT/main/build.sh | bash
 
 To install RakNet
+
 go to /RakNet
+
 cmake .
+
 make
+
 make install
 
 
