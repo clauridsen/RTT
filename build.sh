@@ -12,6 +12,6 @@ sudo apt-get install libbullet-dev -y
 sudo apt install git
 
 # RakNet installation:
-git clone https://github.com/facebookarchive/RakNet.git /home/pi/RakNet
+git clone https://github.com/clauridsen/RakNet.git /home/pi/RakNet
 cd /home/pi/RakNet
 sudo reboot
