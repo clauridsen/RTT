@@ -17,7 +17,7 @@ sudo apt-get install libbullet-dev -y
 sudo apt install git --yes
 
 # RakNet installation:
-git clone https://github.com/clauridsen/RakNet.git /home/pi/RakNet
+git clone https://github.com/clauridsen/RakNet.git /pi/RakNet
 cmake .
 make
 make install
