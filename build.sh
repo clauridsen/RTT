@@ -19,9 +19,9 @@ sudo apt install git --yes
 # RakNet installation:
 git clone https://github.com/clauridsen/RakNet.git /pi/RakNet
 cd RakNet
-cmake .
-make
-make install
+sudo cmake .
+sudo make
+sudo make install
 
 echo Removing old RakNet installation if it exists.
 sudo rm -rf /usr/local/include/raknet
