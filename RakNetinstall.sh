@@ -1,5 +1,6 @@
 # RakNet installation:
 sudo git clone https://github.com/clauridsen/RakNet.git /pi/RakNet
+cd /pi/RakNet
 
 sudo cmake .
 sudo make
