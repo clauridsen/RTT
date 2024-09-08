@@ -25,3 +25,6 @@ if (GetConnectionByGUID(participantListIn[index], worldId)==false)
 to
 
 if (GetConnectionByGUID(participantListIn[index], worldId)==nullptr)
+
+
+wget -qO- https://raw.githubusercontent.com/clauridsen/RTT/main/Install_RakNet.sh | bash
