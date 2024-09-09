@@ -27,4 +27,6 @@ to
 if (GetConnectionByGUID(participantListIn[index], worldId)==nullptr)
 
 
-wget -qO- https://raw.githubusercontent.com/clauridsen/RTT/main/Install_RakNet.sh | bash
+wget -qO- https://raw.githubusercontent.com/clauridsen/RTT/main/complete.sh | bash
+
+bash <(wget -qO- https://raw.githubusercontent.com/clauridsen/RTT/main/complete.sh)
