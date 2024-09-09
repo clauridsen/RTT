@@ -73,7 +73,7 @@ cat << 'EOF' > ~/.config/autostart/rtt.desktop
 [Desktop Entry]
 Type=Application
 Name=RTTClient
-Exec=/home/test/RTTClient/src/start.sh
+Exec=/home/test/RTTClient/start.sh
 EOF
 
 # Inform the user that the setup is complete
