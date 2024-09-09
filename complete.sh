@@ -58,7 +58,7 @@ cp font.ttf ~/RTTClient/
 echo "Creating start.sh..."
 cat << 'EOF' > ~/RTTClient/start.sh
 #!/bin/bash
-cd /home/pi/RTTClient
+cd /home/test/RTTClient
 ./RTTClient
 EOF
 
