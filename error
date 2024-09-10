@@ -1,4 +1,4 @@
-CMake Warning (dev) at /usr/share/cmake-3.18/Modules/FindOpenGL.cmake:305 (message):
-  Policy CMP0072 is not set: FindOpenGL prefers GLVND by default when
-  available.  Run "cmake --help-policy CMP0072" for policy details.  Use the
-  cmake_policy command to set the policy and suppress this warning.
+CMake Error at src/CMakeLists.txt:20 (FIND_PACKAGE):
+  By not providing "FindRakNet.cmake" in CMAKE_MODULE_PATH this project has
+  asked CMake to find a package configuration file provided by "RakNet", but
+  CMake did not find one.
