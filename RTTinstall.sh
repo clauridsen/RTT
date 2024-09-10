@@ -5,89 +5,37 @@
 # Ensure script is being run with root privileges
 if [ "$EUID" -ne 0 ]; then
   echo "Please run as root"
-  exit 1
+  exit
 fi
 
 # Log file
 LOG_FILE="/home/pi/install_log.txt"
-
-# Check if log file is writable
-if [ ! -w "$LOG_FILE" ] && [ ! -f "$LOG_FILE" ]; then
-  touch "$LOG_FILE"
-  if [ $? -ne 0 ]; then
-    echo "Error: Unable to create or write to log file at $LOG_FILE"
-    exit 1
-  fi
-fi
 
 # Function to remove directory if it exists
 remove_dir_if_exists() {
   if [ -d "$1" ]; then
     echo "Removing existing directory $1..." | tee -a "$LOG_FILE"
     rm -rf "$1"
-    if [ $? -eq 0 ]; then
-      echo "Directory $1 removed." | tee -a "$LOG_FILE"
-    else
-      echo "Error: Failed to remove directory $1." | tee -a "$LOG_FILE"
-      exit 1
-    fi
+    echo "Directory $1 removed." | tee -a "$LOG_FILE"
   fi
 }
 
 # Update and install dependencies
 echo "Installing necessary packages..." | tee -a "$LOG_FILE"
-apt-get update | tee -a "$LOG_FILE"
-if [ $? -ne 0 ]; then
-  echo "Error: Failed to update package lists." | tee -a "$LOG_FILE"
-  exit 1
-fi
-
-apt-get install -y build-essential gdb g++ zip cmake libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libglew-dev | tee -a "$LOG_FILE"
-if [ $? -ne 0 ]; then
-  echo "Error: Package installation failed." | tee -a "$LOG_FILE"
-  exit 1
-fi
+sudo apt-get update | tee -a "$LOG_FILE"
+sudo apt-get install -y build-essential gdb g++ zip cmake libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libglew-dev | tee -a "$LOG_FILE"
 
 # Remove existing RakNet directory if it exists
 remove_dir_if_exists "/home/pi/RakNet"
 
-# Clone RakNet and set the required configuration
-echo "Cloning RakNet..." | tee -a "$LOG_FILE"
+# Clone and build RakNet
+echo "Cloning and building RakNet..." | tee -a "$LOG_FILE"
 cd /home/pi
-git clone https://github.com/larku/RakNet | tee -a "$LOG_FILE"
-if [ $? -ne 0 ]; then
-  echo "Error: Failed to clone RakNet." | tee -a "$LOG_FILE"
-  exit 1
-fi
-
-# Modify RakNetDefinesOverrides.h for compatibility
-echo "Configuring RakNet for RTTClient..." | tee -a "$LOG_FILE"
-cd /home/pi/RakNet/Source
-if grep -q "#define USE_SLIDING_WINDOW_CONGESTION_CONTROL 0" RakNetDefinesOverrides.h; then
-  echo "RakNetDefinesOverrides.h already configured." | tee -a "$LOG_FILE"
-else
-  echo "#define USE_SLIDING_WINDOW_CONGESTION_CONTROL 0" >> RakNetDefinesOverrides.h
-  echo "RakNetDefinesOverrides.h updated." | tee -a "$LOG_FILE"
-fi
-
-# Compile RakNet
-echo "Building RakNet..." | tee -a "$LOG_FILE"
-mkdir -p /home/pi/RakNet/Lib
-cd /home/pi/RakNet/Source
-cmake -Bbuild -H. | tee -a "$LOG_FILE"
-if [ $? -ne 0 ]; then
-  echo "Error: CMake configuration failed for RakNet." | tee -a "$LOG_FILE"
-  exit 1
-fi
-
-cmake --build build --target RakNetLibStatic | tee -a "$LOG_FILE"
-if [ $? -ne 0 ] || [ ! -f "build/libRakNetLibStatic.a" ]; then
-  echo "Error: RakNet library was not built." | tee -a "$LOG_FILE"
-  exit 1
-fi
-
-cp build/libRakNetLibStatic.a /home/pi/RakNet/Lib/
-echo "RakNet library built and copied successfully." | tee -a "$LOG_FILE"
+sudo git clone https://github.com/clauridsen/RakNet.git | tee -a "$LOG_FILE"
+cd RakNet
+sudo cmake . | tee -a "$LOG_FILE"
+sudo make | tee -a "$LOG_FILE"
+sudo make install | tee -a "$LOG_FILE"
 
 # Remove existing RTTClient directory if it exists
 remove_dir_if_exists "/home/pi/projects/RTTClient"
@@ -97,10 +45,6 @@ echo "Cloning RTTClient..." | tee -a "$LOG_FILE"
 mkdir -p /home/pi/projects
 cd /home/pi/projects
 git clone https://github.com/clauridsen/RTTClient.git | tee -a "$LOG_FILE" # Replace with the actual repository link
-if [ $? -ne 0 ]; then
-  echo "Error: Failed to clone RTTClient." | tee -a "$LOG_FILE"
-  exit 1
-fi
 
 # Verify RTTClient directory exists
 if [ ! -d "/home/pi/projects/RTTClient" ]; then
@@ -118,7 +62,7 @@ project(RTTClient)
 
 # Angiv stien til RakNet inkluderingsfiler og bibliotek
 set(RAKNET_INCLUDE_DIR "/home/pi/RakNet/Source")
-set(RAKNET_LIBRARY "/home/pi/RakNet/Lib/libRakNetLibStatic.a")
+set(RAKNET_LIBRARY "/usr/local/lib/libRakNetLibStatic.a")
 
 # Inkluder RakNet headers
 include_directories(${RAKNET_INCLUDE_DIR})
@@ -134,18 +78,15 @@ EOF
 echo "Building RTTClient with CMake..." | tee -a "$LOG_FILE"
 cd /home/pi/projects/RTTClient
 cmake . | tee -a "$LOG_FILE"
-if [ $? -ne 0 ]; then
-  echo "Error: CMake configuration for RTTClient failed." | tee -a "$LOG_FILE"
-  exit 1
-fi
-
 cmake --build . | tee -a "$LOG_FILE" 2>&1
-if [ $? -ne 0 ]; then
+
+# If CMake build fails, try manual build
+if [ ! -f "src/RTTClient" ]; then
   echo "CMake build failed. Trying manual build..." | tee -a "$LOG_FILE"
   cd /home/pi/projects/RTTClient/src
-  g++ -I/home/pi/RakNet/Source -o RTTClient main.cpp /home/pi/RakNet/Lib/libRakNetLibStatic.a -lSDL2 -lSDL2_image -lSDL2_ttf -lGLEW -lGL -lpthread | tee -a "$LOG_FILE" 2>&1
-  if [ $? -ne 0 ] || [ ! -f "RTTClient" ]; then
-    echo "Error: RTTClient was not built manually." | tee -a "$LOG_FILE"
+  g++ -I/home/pi/RakNet/Source -o RTTClient main.cpp /usr/local/lib/libRakNetLibStatic.a -lSDL2 -lSDL2_image -lSDL2_ttf -lGLEW -lGL -lpthread | tee -a "$LOG_FILE" 2>&1
+  if [ ! -f "RTTClient" ]; then
+    echo "Error: RTTClient was not built." | tee -a "$LOG_FILE"
     exit 1
   fi
 fi
