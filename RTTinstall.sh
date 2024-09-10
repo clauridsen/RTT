@@ -40,8 +40,11 @@ fi
 
 # Compile RakNet
 echo "Building RakNet..."
-cmake .
-cmake --build .
+mkdir -p /home/pi/RakNet/Lib
+cd /home/pi/RakNet/Source
+cmake -Bbuild -H.
+cmake --build build --target RakNetLibStatic
+cp build/libRakNetLibStatic.a /home/pi/RakNet/Lib/
 
 # Remove existing RTTClient directory if it exists
 remove_dir_if_exists "/home/pi/projects/RTTClient"
