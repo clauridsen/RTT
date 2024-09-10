@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Version 2.1
+# Version 2.4
 
 # Ensure script is being run with root privileges
 if [ "$EUID" -ne 0 ]; then
@@ -28,30 +28,22 @@ sudo apt-get install -y build-essential gdb g++ zip cmake libsdl2-dev libsdl2-im
 # Remove existing RakNet directory if it exists
 remove_dir_if_exists "/home/pi/RakNet"
 
-# Clone RakNet and set the required configuration
-echo "Cloning RakNet..." | tee -a "$LOG_FILE"
+# Clone and build RakNet
+echo "Cloning and building RakNet..." | tee -a "$LOG_FILE"
 cd /home/pi
-git clone https://github.com/larku/RakNet | tee -a "$LOG_FILE"
-
-# Modify RakNetDefinesOverrides.h for compatibility
-echo "Configuring RakNet for RTTClient..." | tee -a "$LOG_FILE"
-cd /home/pi/RakNet/Source
-if grep -q "#define USE_SLIDING_WINDOW_CONGESTION_CONTROL 0" RakNetDefinesOverrides.h; then
-  echo "RakNetDefinesOverrides.h already configured." | tee -a "$LOG_FILE"
-else
-  echo "#define USE_SLIDING_WINDOW_CONGESTION_CONTROL 0" >> RakNetDefinesOverrides.h
-  echo "RakNetDefinesOverrides.h updated." | tee -a "$LOG_FILE"
-fi
-
-# Compile RakNet
-echo "Building RakNet..." | tee -a "$LOG_FILE"
-cmake . | tee -a "$LOG_FILE"
-cmake --build . | tee -a "$LOG_FILE"
+git clone https://github.com/chrisi/RakNet.git | tee -a "$LOG_FILE"
+cd RakNet
+mkdir build
+cd build
+cmake -DDISABLEDEPENDENCIES=TRUE ../ | tee -a "$LOG_FILE"
+make | tee -a "$LOG_FILE"
 
 # Verify RakNet library exists
-if [ ! -f "/lib/libstatic/libRakNetLibStatic.a" ]; then
+if [ ! -f "/home/pi/RakNet/build/libRakNetLibStatic.a" ]; then
   echo "Error: RakNet library was not built." | tee -a "$LOG_FILE"
   exit 1
+else
+  echo "RakNet library found at /home/pi/RakNet/build/libRakNetLibStatic.a" | tee -a "$LOG_FILE"
 fi
 
 # Remove existing RTTClient directory if it exists
@@ -79,7 +71,7 @@ project(RTTClient)
 
 # Angiv stien til RakNet inkluderingsfiler og bibliotek
 set(RAKNET_INCLUDE_DIR "/home/pi/RakNet/Source")
-set(RAKNET_LIBRARY "/lib/libstatic/libRakNetLibStatic.a")
+set(RAKNET_LIBRARY "/home/pi/RakNet/build/libRakNetLibStatic.a")
 
 # Inkluder RakNet headers
 include_directories(${RAKNET_INCLUDE_DIR})
@@ -101,7 +93,7 @@ cmake --build . | tee -a "$LOG_FILE" 2>&1
 if [ ! -f "src/RTTClient" ]; then
   echo "CMake build failed. Trying manual build..." | tee -a "$LOG_FILE"
   cd /home/pi/projects/RTTClient/src
-  g++ -I/home/pi/RakNet/Source -o RTTClient main.cpp /lib/libstatic/libRakNetLibStatic.a -lSDL2 -lSDL2_image -lSDL2_ttf -lGLEW -lGL -lpthread | tee -a "$LOG_FILE" 2>&1
+  g++ -I/home/pi/RakNet/Source -o RTTClient main.cpp /home/pi/RakNet/build/libRakNetLibStatic.a -lSDL2 -lSDL2_image -lSDL2_ttf -lGLEW -lGL -lpthread | tee -a "$LOG_FILE" 2>&1
   if [ ! -f "RTTClient" ]; then
     echo "Error: RTTClient was not built." | tee -a "$LOG_FILE"
     exit 1
