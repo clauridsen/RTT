@@ -44,7 +44,7 @@ cmake .
 cmake --build .
 
 # Remove existing RTTClient directory if it exists
-remove_dir_if_exists "/home/pi/projects/rttclient"
+remove_dir_if_exists "/home/pi/projects/RTTClient"
 
 # Clone the RTTClient project
 echo "Cloning RTTClient..."
@@ -52,9 +52,37 @@ mkdir -p /home/pi/projects
 cd /home/pi/projects
 git clone https://github.com/clauridsen/RTTClient.git # Replace with the actual repository link
 
+# Verify RTTClient directory exists
+if [ ! -d "/home/pi/projects/RTTClient" ]; then
+  echo "Error: RTTClient directory was not created."
+  exit 1
+fi
+
+# Update CMakeLists.txt to include RakNet paths
+echo "Updating CMakeLists.txt..."
+cat << 'EOF' > /home/pi/projects/RTTClient/CMakeLists.txt
+cmake_minimum_required(VERSION 3.18)
+cmake_policy(SET CMP0072 NEW)
+
+project(RTTClient)
+
+# Angiv stien til RakNet inkluderingsfiler og bibliotek
+set(RAKNET_INCLUDE_DIR "/home/pi/RakNet/Source")
+set(RAKNET_LIBRARY "/home/pi/RakNet/Lib/libRakNetLibStatic.a")
+
+# Inkluder RakNet headers
+include_directories(${RAKNET_INCLUDE_DIR})
+
+# Tilføj eksekverbar fil
+add_executable(RTTClient src/main.cpp)
+
+# Link RakNet biblioteket
+target_link_libraries(RTTClient ${RAKNET_LIBRARY})
+EOF
+
 # Build RTTClient
 echo "Building RTTClient..."
-cd rttclient
+cd /home/pi/projects/RTTClient
 cmake .
 cmake --build .
 
@@ -64,9 +92,9 @@ remove_dir_if_exists "/home/pi/RTTClient"
 # Move the necessary files to /home/pi/RTTClient
 echo "Setting up RTTClient folder..."
 mkdir -p /home/pi/RTTClient
-cp src/RTTClient /home/pi/RTTClient/
-cp RTTClient.ini /home/pi/RTTClient/
-cp font.ttf /home/pi/RTTClient/
+cp /home/pi/projects/RTTClient/src/RTTClient /home/pi/RTTClient/
+cp /home/pi/projects/RTTClient/RTTClient.ini /home/pi/RTTClient/
+cp /home/pi/projects/RTTClient/font.ttf /home/pi/RTTClient/
 
 # Create the start.sh script
 echo "Creating start.sh..."
