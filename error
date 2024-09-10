@@ -1,4 +1,6 @@
--- Build files have been written to: /home/pi/projects/RTTClient
-Scanning dependencies of target RTTClient
-[ 50%] Building CXX object CMakeFiles/RTTClient.dir/src/main.cpp.o
+gmake[2]: *** No rule to make target '/home/pi/RakNet/Lib/libRakNetLibStatic.a', needed by 'RTTClient'.  Stop.
+gmake[1]: *** [CMakeFiles/Makefile2:95: CMakeFiles/RTTClient.dir/all] Error 2
+gmake: *** [Makefile:103: all] Error 2
+CMake build failed. Trying manual build...
+g++: error: /home/pi/RakNet/Lib/libRakNetLibStatic.a: No such file or directory
 Error: RTTClient was not built.
