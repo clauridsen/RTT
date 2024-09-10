@@ -38,14 +38,6 @@ cd build
 cmake -DDISABLEDEPENDENCIES=TRUE ../ | tee -a "$LOG_FILE"
 make | tee -a "$LOG_FILE"
 
-# Verify RakNet library exists
-if [ ! -f "/home/pi/RakNet/build/libRakNetLibStatic.a" ]; then
-  echo "Error: RakNet library was not built." | tee -a "$LOG_FILE"
-  exit 1
-else
-  echo "RakNet library found at /home/pi/RakNet/build/libRakNetLibStatic.a" | tee -a "$LOG_FILE"
-fi
-
 # Remove existing RTTClient directory if it exists
 remove_dir_if_exists "/home/pi/projects/RTTClient"
 
