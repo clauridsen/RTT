@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Version 2.0
+# Version 2.1
 
 # Ensure script is being run with root privileges
 if [ "$EUID" -ne 0 ]; then
@@ -28,14 +28,25 @@ sudo apt-get install -y build-essential gdb g++ zip cmake libsdl2-dev libsdl2-im
 # Remove existing RakNet directory if it exists
 remove_dir_if_exists "/home/pi/RakNet"
 
-# Clone and build RakNet
-echo "Cloning and building RakNet..." | tee -a "$LOG_FILE"
+# Clone RakNet and set the required configuration
+echo "Cloning RakNet..." | tee -a "$LOG_FILE"
 cd /home/pi
-sudo git clone https://github.com/clauridsen/RakNet.git | tee -a "$LOG_FILE"
-cd RakNet
-sudo cmake . | tee -a "$LOG_FILE"
-sudo make | tee -a "$LOG_FILE"
-sudo make install | tee -a "$LOG_FILE"
+git clone https://github.com/larku/RakNet | tee -a "$LOG_FILE"
+
+# Modify RakNetDefinesOverrides.h for compatibility
+echo "Configuring RakNet for RTTClient..." | tee -a "$LOG_FILE"
+cd /home/pi/RakNet/Source
+if grep -q "#define USE_SLIDING_WINDOW_CONGESTION_CONTROL 0" RakNetDefinesOverrides.h; then
+  echo "RakNetDefinesOverrides.h already configured." | tee -a "$LOG_FILE"
+else
+  echo "#define USE_SLIDING_WINDOW_CONGESTION_CONTROL 0" >> RakNetDefinesOverrides.h
+  echo "RakNetDefinesOverrides.h updated." | tee -a "$LOG_FILE"
+fi
+
+# Compile RakNet
+echo "Building RakNet..." | tee -a "$LOG_FILE"
+cmake . | tee -a "$LOG_FILE"
+cmake --build . | tee -a "$LOG_FILE"
 
 # Verify RakNet library exists
 if [ ! -f "/lib/libstatic/libRakNetLibStatic.a" ]; then
