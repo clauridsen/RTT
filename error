@@ -1,4 +1,3 @@
-CMake Error at src/CMakeLists.txt:20 (FIND_PACKAGE):
-  By not providing "FindRakNet.cmake" in CMAKE_MODULE_PATH this project has
-  asked CMake to find a package configuration file provided by "RakNet", but
-  CMake did not find one.
+gmake[2]: *** No rule to make target '/home/pi/RakNet/Lib/libRakNetLibStatic.a', needed by 'RTTClient'.  Stop.
+gmake[1]: *** [CMakeFiles/Makefile2:95: CMakeFiles/RTTClient.dir/all] Error 2
+gmake: *** [Makefile:103: all] Error 2
