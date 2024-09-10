@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Version 1.3
+# Version 1.4
 
 # Ensure script is being run with root privileges
 if [ "$EUID" -ne 0 ]; then
@@ -81,18 +81,25 @@ include_directories(${RAKNET_INCLUDE_DIR})
 # Tilføj eksekverbar fil
 add_executable(RTTClient src/main.cpp)
 
-# Link RakNet biblioteket
-target_link_libraries(RTTClient ${RAKNET_LIBRARY})
+# Link RakNet biblioteket og andre nødvendige biblioteker
+target_link_libraries(RTTClient ${RAKNET_LIBRARY} SDL2 SDL2_image SDL2_ttf GLEW GL pthread)
 EOF
 
-# Build RTTClient
-echo "Building RTTClient..." | tee -a "$LOG_FILE"
+# Build RTTClient using CMake
+echo "Building RTTClient with CMake..." | tee -a "$LOG_FILE"
 cd /home/pi/projects/RTTClient
 cmake . | tee -a "$LOG_FILE"
 cmake --build . | tee -a "$LOG_FILE" 2>&1
+
+# If CMake build fails, try manual build
 if [ ! -f "src/RTTClient" ]; then
-  echo "Error: RTTClient was not built." | tee -a "$LOG_FILE"
-  exit 1
+  echo "CMake build failed. Trying manual build..." | tee -a "$LOG_FILE"
+  cd /home/pi/projects/RTTClient/src
+  g++ -I/home/pi/RakNet/Source -o RTTClient main.cpp /home/pi/RakNet/Lib/libRakNetLibStatic.a -lSDL2 -lSDL2_image -lSDL2_ttf -lGLEW -lGL -lpthread | tee -a "$LOG_FILE" 2>&1
+  if [ ! -f "RTTClient" ]; then
+    echo "Error: RTTClient was not built." | tee -a "$LOG_FILE"
+    exit 1
+  fi
 fi
 
 # Remove existing RTTClient setup directory if it exists
