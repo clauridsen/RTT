@@ -1,0 +1,4 @@
+CMake Warning (dev) at /usr/share/cmake-3.18/Modules/FindOpenGL.cmake:305 (message):
+  Policy CMP0072 is not set: FindOpenGL prefers GLVND by default when
+  available.  Run "cmake --help-policy CMP0072" for policy details.  Use the
+  cmake_policy command to set the policy and suppress this warning.
