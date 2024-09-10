@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Version 1.9
+# Version 2.0
 
 # Ensure script is being run with root privileges
 if [ "$EUID" -ne 0 ]; then
