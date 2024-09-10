@@ -1,2 +1,2 @@
--- Build files have been written to: /home/pi/RakNet/Source/build
-Error: RakNet library was not built.
+[ 50%] Building CXX object CMakeFiles/RTTClient.dir/src/main.cpp.o
+Error: RTTClient was not built.
