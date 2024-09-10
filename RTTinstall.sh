@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Version 1.2
+# Version 1.3
 
 # Ensure script is being run with root privileges
 if [ "$EUID" -ne 0 ]; then
@@ -89,7 +89,7 @@ EOF
 echo "Building RTTClient..." | tee -a "$LOG_FILE"
 cd /home/pi/projects/RTTClient
 cmake . | tee -a "$LOG_FILE"
-cmake --build . | tee -a "$LOG_FILE"
+cmake --build . | tee -a "$LOG_FILE" 2>&1
 if [ ! -f "src/RTTClient" ]; then
   echo "Error: RTTClient was not built." | tee -a "$LOG_FILE"
   exit 1
