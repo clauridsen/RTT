@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Version 1.0
+
 # Ensure script is being run with root privileges
 if [ "$EUID" -ne 0 ]; then
   echo "Please run as root"
