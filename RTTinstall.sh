@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Version 1.0
+# Version 1.1
 
 # Ensure script is being run with root privileges
 if [ "$EUID" -ne 0 ]; then
@@ -45,17 +45,8 @@ fi
 
 # Compile RakNet
 echo "Building RakNet..." | tee -a "$LOG_FILE"
-mkdir -p /home/pi/RakNet/Lib
-cd /home/pi/RakNet/Source
-cmake -Bbuild -H. | tee -a "$LOG_FILE"
-cmake --build build --target RakNetLibStatic | tee -a "$LOG_FILE"
-if [ -f "build/libRakNetLibStatic.a" ]; then
-  cp build/libRakNetLibStatic.a /home/pi/RakNet/Lib/
-  echo "RakNet library built and copied successfully." | tee -a "$LOG_FILE"
-else
-  echo "Error: RakNet library was not built." | tee -a "$LOG_FILE"
-  exit 1
-fi
+cmake . | tee -a "$LOG_FILE"
+cmake --build . | tee -a "$LOG_FILE"
 
 # Remove existing RTTClient directory if it exists
 remove_dir_if_exists "/home/pi/projects/RTTClient"
