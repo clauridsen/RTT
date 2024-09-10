@@ -44,7 +44,13 @@ mkdir -p /home/pi/RakNet/Lib
 cd /home/pi/RakNet/Source
 cmake -Bbuild -H.
 cmake --build build --target RakNetLibStatic
-cp build/libRakNetLibStatic.a /home/pi/RakNet/Lib/
+if [ -f "build/libRakNetLibStatic.a" ]; then
+  cp build/libRakNetLibStatic.a /home/pi/RakNet/Lib/
+  echo "RakNet library built and copied successfully."
+else
+  echo "Error: RakNet library was not built."
+  exit 1
+fi
 
 # Remove existing RTTClient directory if it exists
 remove_dir_if_exists "/home/pi/projects/RTTClient"
@@ -88,6 +94,10 @@ echo "Building RTTClient..."
 cd /home/pi/projects/RTTClient
 cmake .
 cmake --build .
+if [ ! -f "src/RTTClient" ]; then
+  echo "Error: RTTClient was not built."
+  exit 1
+fi
 
 # Remove existing RTTClient setup directory if it exists
 remove_dir_if_exists "/home/pi/RTTClient"
@@ -123,3 +133,4 @@ EOF
 
 # Inform the user that the setup is complete
 echo "RTTClient setup complete. It will now start automatically on boot."
+
