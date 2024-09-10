@@ -1,3 +1,2 @@
-gmake[2]: *** No rule to make target '/home/pi/RakNet/Lib/libRakNetLibStatic.a', needed by 'RTTClient'.  Stop.
-gmake[1]: *** [CMakeFiles/Makefile2:95: CMakeFiles/RTTClient.dir/all] Error 2
-gmake: *** [Makefile:103: all] Error 2
+-- Build files have been written to: /home/pi/RakNet/Source/build
+Error: RakNet library was not built.
