@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Version 1.7
+# Version 1.9
 
 # Ensure script is being run with root privileges
 if [ "$EUID" -ne 0 ]; then
@@ -37,6 +37,12 @@ sudo cmake . | tee -a "$LOG_FILE"
 sudo make | tee -a "$LOG_FILE"
 sudo make install | tee -a "$LOG_FILE"
 
+# Verify RakNet library exists
+if [ ! -f "/lib/libstatic/libRakNetLibStatic.a" ]; then
+  echo "Error: RakNet library was not built." | tee -a "$LOG_FILE"
+  exit 1
+fi
+
 # Remove existing RTTClient directory if it exists
 remove_dir_if_exists "/home/pi/projects/RTTClient"
 
@@ -62,7 +68,7 @@ project(RTTClient)
 
 # Angiv stien til RakNet inkluderingsfiler og bibliotek
 set(RAKNET_INCLUDE_DIR "/home/pi/RakNet/Source")
-set(RAKNET_LIBRARY "/usr/local/lib/libRakNetLibStatic.a")
+set(RAKNET_LIBRARY "/lib/libstatic/libRakNetLibStatic.a")
 
 # Inkluder RakNet headers
 include_directories(${RAKNET_INCLUDE_DIR})
@@ -84,7 +90,7 @@ cmake --build . | tee -a "$LOG_FILE" 2>&1
 if [ ! -f "src/RTTClient" ]; then
   echo "CMake build failed. Trying manual build..." | tee -a "$LOG_FILE"
   cd /home/pi/projects/RTTClient/src
-  g++ -I/home/pi/RakNet/Source -o RTTClient main.cpp /usr/local/lib/libRakNetLibStatic.a -lSDL2 -lSDL2_image -lSDL2_ttf -lGLEW -lGL -lpthread | tee -a "$LOG_FILE" 2>&1
+  g++ -I/home/pi/RakNet/Source -o RTTClient main.cpp /lib/libstatic/libRakNetLibStatic.a -lSDL2 -lSDL2_image -lSDL2_ttf -lGLEW -lGL -lpthread | tee -a "$LOG_FILE" 2>&1
   if [ ! -f "RTTClient" ]; then
     echo "Error: RTTClient was not built." | tee -a "$LOG_FILE"
     exit 1
